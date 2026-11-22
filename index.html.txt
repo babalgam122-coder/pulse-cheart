@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <!-- Эта строка критически важна для телефонов: без неё сайт будет огромным -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Пульсирующее сердце</title>
+    <style>
+        /* Базовые настройки страницы */
+        body {
+            background-color: #121212; /* Темный фон */
+            color: #ff3b5c;            /* Цвет сердца (ярко-розовый/красный) */
+            font-family: 'Courier New', Courier, monospace; /* Моноширинный шрифт обязателен для ASCII-арта */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;          /* Убирает полосы прокрутки */
+            touch-action: none;        /* Отключает зум на телефоне */
+        }
+
+        /* Контейнер для сердца */
+        #heart-container {
+            text-align: center;
+            line-height: 1.1;          /* Плотное расположение строк */
+            font-size: 14px;           /* Оптимальный размер для мобильных */
+        }
+
+        /* Адаптив для очень маленьких экранов (меньше 320px) */
+        @media (max-width: 320px) {
+            #heart-container {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="heart-container"></div>
+
+    <script>
+        // Данные для большого сердца (фаза удара)
+        const BIG = [
+            "  **********      **********  ",
+            "**************  **************",
+            "********************************",
+            "********************************",
+            "********************************",
+            "  ****************************  ",
+            "    ************************    ",
+            "      **********************    ",
+            "        ******************      ",
+            "          **************        ",
+            "            **********          ",
+            "              ******            ",
+            "                **              ",
+        ];
+
+        // Данные для маленького сердца (фаза расслабления)
+        const SMALL = [
+            "  ********    ********  ",
+            "************  **********",
+            "************************",
+            "************************",
+            "  **********************",
+            "    ******************  ",
+            "      **************    ",
+            "        **********      ",
+            "          ******        ",
+            "            **          ",
+        ];
+
+        const container = document.getElementById('heart-container');
+        let builtLines = ;
+        
+        // Настройки скорости (в миллисекундах)
+        const buildDelay = 150;   // Скорость сборки (быстрее, чем в консольном варианте)
+        const pulseDelay = 300;   // Скорость пульсации
+        
+        let isBuilding = true;
+
+        // Функция отрисовки: превращает массив строк в HTML
+        function render() {
+            container.innerHTML = builtLines.join('<br>');
+        }
+
+        // Этап 1: Сборка сердца по строчкам
+        function startBuild() {
+            if (isBuilding) {
+                if (builtLines.length < BIG.length) {
+                    // Добавляем следующую строку из большого сердца
+                    builtLines.push(BIG[builtLines.length]);
+                    render();
+                    // Планируем следующий шаг
+                    setTimeout(startBuild, buildDelay);
+                } else {
+                    // Сердце собрано, переходим к пульсации
+                    isBuilding = false;
+                    startPulse();
+                }
+            }
+        }
+
+        // Этап 2: Бесконечная пульсация
+        function startPulse() {
+            // Фаза "Удар" (большое сердце)
+            builtLines = [...BIG];
+            render();
+            
+            setTimeout(() => {
+                // Фаза "Расслабление" (маленькое сердце)
+                builtLines = [...SMALL];
+                render();
+                
+                // Повторяем цикл пульсации
+                setTimeout(startPulse, pulseDelay);
+            }, pulseDelay);
+        }
+
+        // Запуск анимации
+        startBuild();
+    </script>
+</body>
+</html>
